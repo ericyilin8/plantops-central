@@ -56,7 +56,7 @@ $(document).ready(function() {
             }
         });
     });
-    //
+    
     // Helper to safely escape HTML output
     function escapeHtml(str) {
         return $('<div>').text(str).html();
