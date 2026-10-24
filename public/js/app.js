@@ -1,3 +1,5 @@
+
+//FETCH INCIDENTS
 $(document).ready(function() {
     $('#load-data-btn').on('click', function() {
         const $btn = $(this);
@@ -30,7 +32,7 @@ $(document).ready(function() {
                             const rowHtml = `
                                 <tr>
                                     <td>${escapeHtml(incident.id ?? '')}</td>
-                                    <td>${escapeHtml(incident.title ?? incident.name ?? '')}</td>
+                                    <td>${escapeHtml(incident.description ?? '')}</td>
                                     <td>${escapeHtml(incident.status ?? '')}</td>
                                     <td>${escapeHtml(incident.created_at ?? '')}</td>
                                 </tr>
@@ -63,6 +65,7 @@ $(document).ready(function() {
     }
 });
 
+//ADD INCIDENT
 $(document).ready(function() {
     $('#addIncidentForm').on('submit', function(e) {
         e.preventDefault(); // Stop page reload

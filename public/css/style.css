@@ -147,3 +147,13 @@ body {
 .incidents-table tr:hover {
     background-color: #f9fafb;
 }
+
+#description {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 80px;
+}
