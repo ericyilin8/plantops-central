@@ -54,4 +54,29 @@ class IncidentService {
     // Pass validated data to model
     return $this->incidentModel->create($data);
     }
+
+    //Delete incident by ID
+    public function deleteIncident($id) {
+        $id = filter_var($id, FILTER_VALIDATE_INT);
+        
+        if (!$id) {
+            throw new \InvalidArgumentException("Invalid incident ID provided.");
+        }
+
+        // Delegate deletion to the model layer
+        return $this->incidentModel->delete($id);
+    }
+
+    public function updateIncident($id, $data) {
+        $id = filter_var($id, FILTER_VALIDATE_INT);
+        if (!$id) {
+            throw new \InvalidArgumentException("Invalid incident ID provided.");
+        }
+
+        if (empty($data['asset_id']) || empty($data['severity']) || empty($data['description']) || empty($data['status'])) {
+            throw new \InvalidArgumentException("Missing required fields for update.");
+        }
+
+        return $this->incidentModel->update($id, $data);
+    }
 }

@@ -4,8 +4,6 @@
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../src/Models/Incident.php';
-require_once __DIR__ . '/../../src/Services/IncidentService.php';
 
 try {
     $incidentModel = new \PlantOps\Models\Incident($pdo);

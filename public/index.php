@@ -66,7 +66,9 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Asset ID</th>
                                 <th>Description</th>
+                                <th>Severity</th>
                                 <th>Status</th>
                                 <th>Created At</th>
                             </tr>
@@ -80,6 +82,58 @@
 
     </div>
 
+    <!-- Custom Popup Modal -->
+    <div id="editModalOverlay" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <div class="custom-modal-header">
+                <h3>Edit Incident</h3>
+                <button type="button" class="btn-close-modal" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">&times;</button>
+            </div>
+            <form id="editForm">
+                <div style="margin-bottom: 12px;">
+                    <!-- Visible display for the user -->
+                    <span id="editIncidentIdDisplay" style="font-family: monospace; background: #f1f3f5; padding: 4px 8px; border-radius: 4px; display: inline-block;"></span>
+                    
+                    <!-- Hidden input to hold the value for your AJAX payload -->
+                    <input type="hidden" id="editIncidentId" name="id">
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label for="editAssetId" style="display:block; margin-bottom:4px;">Asset ID</label>
+                    <input type="text" id="editAssetId" name="asset_id" style="width:100%; padding:8px; box-sizing:border-box;" required>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label for="editDescription" style="display:block; margin-bottom:4px;">Description</label>
+                    <textarea id="editDescription" name="description" rows="3" style="width:100%; padding:8px; box-sizing:border-box;" required></textarea>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label for="editSeverity" style="display:block; margin-bottom:4px;">Severity</label>
+                    <select id="editSeverity" name="severity" style="width:100%; padding:8px; box-sizing:border-box;" required>
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label for="editStatus" style="display:block; margin-bottom:4px;">Status</label>
+                    <select id="editStatus" name="status" style="width:100%; padding:8px; box-sizing:border-box;" required>
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+
+                <div class="custom-modal-footer">
+                    <button type="button" id="cancelModalBtn" style="padding:8px 16px; cursor:pointer;">Cancel</button>
+                    <button type="submit" style="padding:8px 16px; background:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- Custom JS -->
