@@ -1,11 +1,23 @@
-    // Track current state globally or in closure scope
-    let currentState = {
-        page: 1,
-        sort: '',
-        direction: ''
-    };
+// Track current state globally or in closure scope
+let currentState = {
+    page: 1,
+    sort: '',
+    direction: ''
+};
+
+$(document).ajaxStart(function() {
+    $('#loading-overlay').fadeIn(150);
+});
+
+$(document).ajaxStop(function() {
+    $('#loading-overlay').fadeOut(150);
+});
 // Centralized function to fetch, sort, paginate, and render incidents
 function loadIncidents(page = 1, sort = 'created_at', direction = 'DESC') {
+    const $container = $('#incidents-container');
+    
+    // 1. Lock the container to its exact pixel height right now so the body doesn't shrink
+    $container.css('height', $container.height());
     const $resultBox = $('#result-box');
     const $outputText = $('#output-text');
     const $tbody = $('#incidents-tbody');
@@ -24,9 +36,27 @@ function loadIncidents(page = 1, sort = 'created_at', direction = 'DESC') {
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                const incidents = Array.isArray(response.data) 
-                    ? response.data 
-                    : (response.data.incidents || []);
+                // Inside success: function(response) {
+                const summary = response.data.summary; // Assume your backend passes aggregate counts & MTTR
+
+                $('#metric-total').text(summary.total_incidents);
+                $('#metric-open').text(summary.open_count);
+                $('#metric-critical').text(summary.critical_count);
+                $('#metric-mttr').text(summary.mttr_hours + ' hrs');
+
+                // Update visual bar percentages
+                const total = summary.total_incidents || 1;
+                const openPct = (summary.open_count / total) * 100;
+                const progPct = (summary.in_progress_count / total) * 100;
+                const resPct = (summary.resolved_count / total) * 100;
+
+                $('#bar-open').css('width', openPct + '%');
+                $('#bar-progress').css('width', progPct + '%');
+                $('#bar-resolved').css('width', resPct + '%');
+
+                $('#breakdown-counts').text(`Open: ${summary.open_count} | In Progress: ${summary.in_progress_count} | Resolved: ${summary.resolved_count}`);
+
+                const incidents = response.data.incidents || [];
 
                 $tbody.empty();
 
@@ -59,29 +89,36 @@ function loadIncidents(page = 1, sort = 'created_at', direction = 'DESC') {
                 $resultBox.addClass('hidden');
                 // 2. Render Pagination Controls based on true grand total
                 const itemsPerPage = 25;
-                const totalPages = Math.ceil(response.data.total_incidents / itemsPerPage);
+                const totalPages = Math.ceil(total/ itemsPerPage);
                 renderPagination(totalPages, currentState.page);
+                window.scrollTo({
+                    top: scrollY,
+                    behavior: 'instant'
+                });
             } else {
                 $resultBox.removeClass('hidden').addClass('error-box');
                 $outputText.addClass('error-text').text('Failed to load dashboard data.');
-            }
+            }//redundant
         },
         error: function(xhr, status, error) {
             $resultBox.removeClass('hidden').addClass('error-box');
             $outputText.addClass('error-text').text('Error fetching data: ' + error);
-        }
+        },
+        complete: function() {
+                    
+                    $container.css('height', '');
+                }      
     });
 }
 
 function renderPagination(totalPages, currentPage) {
     const $container = $('#pagination-container');
     $container.empty();
-
     if (totalPages <= 1) return; // Hide pagination if everything fits on one page
 
     for (let i = 1; i <= totalPages; i++) {
         const activeClass = (i === currentPage) ? 'active' : '';
-        const btnHtml = `<button class="page-btn ${activeClass}" data-page="${i}">${i}</button>`;
+        const btnHtml = `<button type="button" class="page-btn ${activeClass}" data-page="${i}">${i}</button>`;
         $container.append(btnHtml);
     }
 }
@@ -209,7 +246,8 @@ $(document).ready(function() {
                     row.fadeOut(300, function() { $(this).remove(); });
                 } else {
                     alert("Error: " + response.error);
-                }
+                }//redundant
+                loadIncidents(currentState.page, currentState.sort, currentState.direction);
             },
             error: function(xhr) {
                 alert("Failed to delete incident. Server returned status " + xhr.status);
@@ -291,7 +329,8 @@ $(document).ready(function() {
                         row.find('td:nth-child(5)').text(status);
                     } else {
                         alert('Error updating incident: ' + response.error);
-                    }
+                    }//redundant
+                    loadIncidents(currentState.page, currentState.sort, currentState.direction);
             },
             error: function() {
                 alert('Server error while updating incident.');

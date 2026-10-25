@@ -38,22 +38,33 @@ class Incident {
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
+    /**unused
      * Get the true grand total count of all incidents for pagination math
-     */
+     
     public function getTotalCount(): int {
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM incidents");
         return (int) $stmt->fetchColumn();
+    }*/
+
+    public function getSummary(): array {
+ 
+        $summaryStmt =  $this->pdo->query("SELECT COUNT(*) AS total_incidents, SUM(status = 'Open') AS open_count, SUM(status = 'Resolved') AS resolved_count, SUM(status = 'In Progress') AS in_progress_count, SUM(severity = 'Critical') AS critical_count, ROUND(AVG(TIMESTAMPDIFF(HOUR, created_at, resolved_at)), 1) AS mttr_hours FROM incidents");
+        $summary = $summaryStmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $summary;
     }
 
-    /**
+
+    /**unused
      * Fetch all resolved incidents for plant-wide MTTR calculation
-     */
+     
     public function getAllResolvedForMttr(): array {
         $stmt = $this->pdo->query("SELECT created_at, resolved_at FROM incidents WHERE resolved_at IS NOT NULL");
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
+    }*/
 
+    //unused
+    /*
     public function getAllWithAssets() {
         $sql = "
             SELECT 
@@ -64,7 +75,7 @@ class Incident {
             ORDER BY i.created_at DESC
         ";
         return $this->pdo->query($sql)->fetchAll();
-    }
+    }*/
 
 public function create($data) {
     $sql = "INSERT INTO incidents (asset_id, reported_by, assigned_to, severity, status, description, created_at) 

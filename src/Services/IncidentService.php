@@ -14,14 +14,18 @@ class IncidentService {
     $limit = 25;
     $offset = ($page - 1) * $limit;
 
-    // 1. Pass calculated limit and offset to the model
+    $summary = $this->incidentModel->getSummary();
     $incidents = $this->incidentModel->getPaginatedWithAssets($limit, $offset, $sort, $direction);
-    // 2. Get the true grand total count of all incidents in the database (crucial for pagination links!)
-    $totalIncidentsCount = $this->incidentModel->getTotalCount();
 
+    // 1. Pass calculated limit and offset to the model
+    //$incidents = $this->incidentModel->getPaginatedWithAssets($limit, $offset, $sort, $direction);
+    // 2. Get the true grand total count of all incidents in the database (crucial for pagination links!)
+    //$totalIncidentsCount = $this->incidentModel->getTotalCount();
+
+    
     // 3. Calculate MTTR across historical resolved incidents 
     // (Pro-tip: For real scaling, you'd calculate this via a SQL query, but doing it in PHP is fine for medium datasets)
-    $allResolved = $this->incidentModel->getAllResolvedForMttr(); 
+    /*$allResolved = $this->incidentModel->getAllResolvedForMttr(); 
     $totalRepairTimeHours = 0;
     $resolvedCount = count($allResolved);
 
@@ -46,12 +50,11 @@ class IncidentService {
         } else {
             $incident['repair_duration_hours'] = null;
         }
-    }
+    }*/
 
     return [
-        "mttr_hours" => $mttrHours,
-        "total_incidents" => $totalIncidentsCount, // True total for pagination
-        "incidents" => $incidents // Paginated slice for the table
+        "summary" => $summary,
+        "incidents" => $incidents
     ];
 }
 

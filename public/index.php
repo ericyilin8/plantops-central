@@ -8,6 +8,11 @@
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+        </div>
+    </div>
     <div class="container">
         
             <header class="header">
@@ -23,6 +28,38 @@
                 <div id="result-box" class="result-box hidden">
                     <p id="output-text" class="success-text"></p>
                 </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Total Incidents</span>
+                        <span class="metric-value" id="metric-total">-</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Open / Active</span>
+                        <span class="metric-value text-danger" id="metric-open">-</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Critical Severity</span>
+                        <span class="metric-value text-warning" id="metric-critical">-</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Plant MTTR</span>
+                        <span class="metric-value" id="metric-mttr">-</span>
+                    </div>
+                </div>
+
+                <div class="visual-breakdown-container">
+                    <div class="breakdown-header">
+                        <span>Status Distribution</span>
+                        <span id="breakdown-counts">Open: 0 | In Progress: 0 | Resolved: 0</span>
+                    </div>
+                    <div class="status-bar">
+                        <div id="bar-open" class="status-segment bg-danger" style="width: 0%;"></div>
+                        <div id="bar-progress" class="status-segment bg-warning" style="width: 0%;"></div>
+                        <div id="bar-resolved" class="status-segment bg-success" style="width: 0%;"></div>
+                    </div>
+                </div>
+
             </main>
 
             <main class="card">

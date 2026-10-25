@@ -10,7 +10,7 @@ SELECT
     CONCAT('Automated plant incident ticket #', n, ' - checking system stability') AS description,
     NOW() - INTERVAL (n * 3) HOUR AS created_at,
     CASE 
-        WHEN n % 3 = 0 THEN NOW() - INTERVAL (n * 3 - 1) HOUR 
+        WHEN n % 3 = 0 THEN NOW() - INTERVAL (n * 3 - FLOOR(RAND() * 20 + 2)) HOUR 
         ELSE NULL 
     END AS resolved_at
 FROM (
