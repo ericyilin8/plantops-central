@@ -196,3 +196,75 @@ body {
     gap: 8px;
     margin-top: 20px;
 }
+
+/* Base style for sortable headers */
+.sort-header {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+/* Add empty indicator space or arrow via pseudo-elements */
+/* 1. Default neutral state for all sort headers */
+.sort-header::after {
+    content: " ↕";
+    color: #007bff;
+    opacity: 1;
+}
+
+.sort-header.asc::after {
+    content: " ▲";
+    font-size: 0.8em;
+    color: #007bff;
+    opacity: 1;
+}
+
+.sort-header.desc::after {
+    content: " ▼";
+    font-size: 0.8em;
+    color: #007bff;
+    opacity: 1;
+}
+
+/* Container holding the pagination buttons */
+#pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Individual page button base style */
+.page-btn {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #d1d5db;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Hover state for inactive buttons */
+.page-btn:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+/* Active page button state */
+.page-btn.active {
+    background-color: #2563eb; /* Professional blue accent */
+    color: #ffffff;
+    border-color: #2563eb;
+    cursor: default;
+}
+
+/* Focus state for accessibility */
+.page-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}

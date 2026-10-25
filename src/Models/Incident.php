@@ -10,6 +10,50 @@ class Incident {
         $this->pdo = $pdo;
     }
 
+    /**
+     * Fetch paginated and sorted incidents joined with asset info
+     */
+    public function getPaginatedWithAssets(int $limit, int $offset, string $sort, string $direction): array {
+        // 1. Strict Whitelisting for defense against SQL Injection
+        $allowedColumns = ['id', 'asset_id', 'severity', 'status', 'created_at'];
+        $sortCol = in_array($sort, $allowedColumns, true) ? $sort : 'created_at';
+        
+        $sortDir = (strtoupper($direction) === 'ASC') ? 'ASC' : 'DESC';
+
+        // 2. Prepare query (assuming a foreign key relationship with an 'assets' table)
+        // Adjust table/column names to match your exact DB schema if needed
+        $sql = "SELECT i.*, a.name AS asset_name 
+                FROM incidents i 
+                LEFT JOIN assets a ON i.asset_id = a.id 
+                ORDER BY i.{$sortCol} {$sortDir} 
+                LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->pdo->prepare($sql);
+        
+        // 3. Bind limit and offset explicitly as integers for PDO security
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get the true grand total count of all incidents for pagination math
+     */
+    public function getTotalCount(): int {
+        $stmt = $this->pdo->query("SELECT COUNT(*) FROM incidents");
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Fetch all resolved incidents for plant-wide MTTR calculation
+     */
+    public function getAllResolvedForMttr(): array {
+        $stmt = $this->pdo->query("SELECT created_at, resolved_at FROM incidents WHERE resolved_at IS NOT NULL");
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
     public function getAllWithAssets() {
         $sql = "
             SELECT 

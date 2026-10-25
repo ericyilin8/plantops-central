@@ -14,6 +14,8 @@ $input = json_decode(file_get_contents('php://input'), true);
 $id = $input['id'] ?? null;
 
 try {
+    $incidentModel = new \PlantOps\Models\Incident($pdo);
+    $incidentService = new \PlantOps\Services\IncidentService($incidentModel);
     $success = $incidentService->updateIncident($id, $input);
     
     if ($success) {

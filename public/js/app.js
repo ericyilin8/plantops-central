@@ -1,79 +1,150 @@
+    // Track current state globally or in closure scope
+    let currentState = {
+        page: 1,
+        sort: '',
+        direction: ''
+    };
+// Centralized function to fetch, sort, paginate, and render incidents
+function loadIncidents(page = 1, sort = 'created_at', direction = 'DESC') {
+    const $resultBox = $('#result-box');
+    const $outputText = $('#output-text');
+    const $tbody = $('#incidents-tbody');
 
-//FETCH INCIDENTS
-$(document).ready(function() {
-    $('#load-data-btn').on('click', function() {
-        const $btn = $(this);
-        const $resultBox = $('#result-box');
-        const $outputText = $('#output-text');
-        const $tableContainer = $('#incidents-container');
-        const $tbody = $('#incidents-tbody');
+    // Optional: show loading state on a general status or button
+    $tbody.html('<tr><td colspan="7" style="text-align:center;">Loading incidents...</td></tr>');
 
-        $btn.prop('disabled', true).text('Loading incidents...');
+    $.ajax({
+        url: 'api/get_incidents.php',
+        method: 'GET',
+        data: {
+            page: page,
+            sort: sort,
+            direction: direction
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                const incidents = Array.isArray(response.data) 
+                    ? response.data 
+                    : (response.data.incidents || []);
 
-        $.ajax({
-            url: 'api/get_incidents.php',
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    // Extract incidents array from dashboard data
-                    const incidents = Array.isArray(response.data) 
-                        ? response.data 
-                        : (response.data.incidents || []);
+                $tbody.empty();
 
-                    // Clear any previous rows
-                    $tbody.empty();
-
-                    if (incidents.length === 0) {
-                        $tbody.append('<tr><td colspan="6" style="text-align:center;">No incidents found.</td></tr>');
-                    } else {
-                        // Loop through each incident and append a row
-                        $.each(incidents, function(index, incident) {
-                            const rowHtml = `
-                                <tr data-id="${escapeHtml(incident.id ?? '')}" 
-                                    data-asset-id="${escapeHtml(incident.asset_id ?? '')}"
-                                    data-description="${escapeHtml(incident.description ?? '')}"
-                                    data-severity="${escapeHtml(incident.severity ?? '')}"
-                                    data-status="${escapeHtml(incident.status ?? '')}">
-                                    <td>${escapeHtml(incident.id ?? '')}</td>
-                                    <td>${escapeHtml(incident.asset_id ?? '')}</td>
-                                    <td>${escapeHtml(incident.description ?? '')}</td>
-                                    <td>${escapeHtml(incident.severity ?? '')}</td>
-                                    <td>${escapeHtml(incident.status ?? '')}</td>
-                                    <td>${escapeHtml(incident.created_at ?? '')}</td>
-                                    <td>
-                                        <button class="btn btn-warning btn-sm btn-edit me-1">Edit</button>
-                                        <button class="btn btn-danger btn-sm btn-delete">Delete</button>
-                                    </td>
-                                </tr>
-                            `;
-                            $tbody.append(rowHtml);
-                        });
-                    }
-
-                    // Show table and hide error status
-                    //$tableContainer.removeClass('hidden');
-                    $resultBox.addClass('hidden');
+                if (incidents.length === 0) {
+                    $tbody.append('<tr><td colspan="8" style="text-align:center;">No incidents found.</td></tr>');
                 } else {
-                    $resultBox.removeClass('hidden').addClass('error-box');
-                    $outputText.addClass('error-text').text('Failed to load dashboard data.');
+                    $.each(incidents, function(index, incident) {
+                        const rowHtml = `
+                            <tr data-id="${escapeHtml(incident.id ?? '')}" 
+                                data-asset-id="${escapeHtml(incident.asset_id ?? '')}"
+                                data-description="${escapeHtml(incident.description ?? '')}"
+                                data-severity="${escapeHtml(incident.severity ?? '')}"
+                                data-status="${escapeHtml(incident.status ?? '')}">
+                                <td>${escapeHtml(incident.id ?? '')}</td>
+                                <td>${escapeHtml(incident.asset_id ?? '')}</td>
+                                <td>${escapeHtml(incident.asset_name ?? '')}</td>
+                                <td>${escapeHtml(incident.description ?? '')}</td>
+                                <td>${escapeHtml(incident.severity ?? '')}</td>
+                                <td>${escapeHtml(incident.status ?? '')}</td>
+                                <td>${escapeHtml(incident.created_at ?? '')}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm btn-edit me-1">Edit</button>
+                                    <button class="btn btn-danger btn-sm btn-delete">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                        $tbody.append(rowHtml);
+                    });
                 }
-            },
-            error: function(xhr, status, error) {
+                $resultBox.addClass('hidden');
+                // 2. Render Pagination Controls based on true grand total
+                const itemsPerPage = 25;
+                const totalPages = Math.ceil(response.data.total_incidents / itemsPerPage);
+                renderPagination(totalPages, currentState.page);
+            } else {
                 $resultBox.removeClass('hidden').addClass('error-box');
-                $outputText.addClass('error-text').text('Error fetching data: ' + error);
-            },
-            complete: function() {
-                $btn.prop('disabled', false).text('Fetch Incidents');
+                $outputText.addClass('error-text').text('Failed to load dashboard data.');
             }
-        });
+        },
+        error: function(xhr, status, error) {
+            $resultBox.removeClass('hidden').addClass('error-box');
+            $outputText.addClass('error-text').text('Error fetching data: ' + error);
+        }
     });
-    
-    // Helper to safely escape HTML output
-    function escapeHtml(str) {
-        return $('<div>').text(str).html();
+}
+
+function renderPagination(totalPages, currentPage) {
+    const $container = $('#pagination-container');
+    $container.empty();
+
+    if (totalPages <= 1) return; // Hide pagination if everything fits on one page
+
+    for (let i = 1; i <= totalPages; i++) {
+        const activeClass = (i === currentPage) ? 'active' : '';
+        const btnHtml = `<button class="page-btn ${activeClass}" data-page="${i}">${i}</button>`;
+        $container.append(btnHtml);
     }
+}
+// Helper to safely escape HTML output
+function escapeHtml(str) {
+    return $('<div>').text(str).html();
+}
+// Click handler for pagination buttons
+$(document).on('click', '.page-btn', function(e) {
+    e.preventDefault();
+    currentState.page = parseInt($(this).data('page'), 10);
+    loadIncidents(currentState.page, currentState.sort, currentState.direction);
 });
+
+//#region on page load, fetch incidents and populate the table, and attach event handlers for sorting and refreshing
+$(document).ready(function() {
+
+
+    // 1. Fetch automatically on initial page load
+    loadIncidents(currentState.page, currentState.sort, currentState.direction);
+
+    // 2. Fetch or refresh when the button is clicked
+    $('#load-data-btn').on('click', function() {
+        loadIncidents(currentState.page, currentState.sort, currentState.direction);
+    });
+
+    // 3. Click handler for sortable column headers (Severity, Status, Created At)
+    $(document).on('click', '.sort-header', function(e) {
+        e.preventDefault();
+        const clickedCol = $(this).data('column');
+
+        $('.sort-header').removeClass('asc desc'); // Clear from all headers
+
+        // Toggle sort direction logic: ASC -> DESC -> None (reset)
+        if (currentState.sort === clickedCol) {
+            if (currentState.direction === 'ASC') {
+                currentState.direction = 'DESC';
+                $(this).addClass('desc');
+            
+            } else if (currentState.direction === 'DESC') {
+                // Reset sorting back to default
+                currentState.sort = 'created_at';
+                currentState.direction = '';
+          
+            } else {
+            currentState.sort = clickedCol;
+            currentState.direction = 'ASC'; // Default new column to ASC
+            $(this).addClass('asc');
+          
+            }
+        } else {
+            currentState.sort = clickedCol;
+            currentState.direction = 'ASC'; // Default new column to ASC
+            $(this).addClass('asc');
+           
+        }
+
+        // Reload table with new sorting state
+        loadIncidents(currentState.page, currentState.sort, currentState.direction);
+    });
+});
+//#endregion
+
 
 //ADD INCIDENT
 $(document).ready(function() {
@@ -101,6 +172,8 @@ $(document).ready(function() {
                 
                 // Optional: Trigger your refresh table function here if you have one
                 // fetchIncidents(); 
+                loadIncidents(currentState.page, currentState.sort, currentState.direction);
+
             },
             error: function(xhr) {
                 let errorMsg = "An error occurred.";

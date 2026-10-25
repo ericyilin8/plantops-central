@@ -6,10 +6,16 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../../config/database.php';
 
 try {
+
+// 1. Capture query parameters sent by frontend AJAX (with safe defaults)
+    $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+    $sort = $_GET['sort'] ?? 'created_at';
+    $direction = $_GET['direction'] ?? 'DESC';
+
     $incidentModel = new \PlantOps\Models\Incident($pdo);
     $incidentService = new \PlantOps\Services\IncidentService($incidentModel);
-    
-    $dashboardData = $incidentService->getDashboardData();
+    // 2. Pass the parameters into your service layer
+    $dashboardData = $incidentService->getDashboardData($page, $sort, $direction);
 
     echo json_encode([
         "success" => true,

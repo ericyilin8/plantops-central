@@ -16,9 +16,8 @@
 
             <main class="card">
                 <h1>Dashboard Overview</h1>
-                <p class="text-muted">Click the button below to fetch data asynchronously from your PHP backend endpoint.</p>
                 
-                <button id="load-data-btn" class="btn" type="button">Fetch PHP Data</button>
+                <button id="load-data-btn" class="btn" type="button">Fetch Latest Incidents</button>
                 
                 <!-- Result Container -->
                 <div id="result-box" class="result-box hidden">
@@ -62,15 +61,26 @@
 
                 <!-- Incidents Table Container -->
                 <div id="incidents-container" class="table-container">
+                    <div class="table-controls">
+                        <div id="pagination-container" class="pagination-nav"></div>
+                    </div>
                     <table class="incidents-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Asset ID</th>
+                                <th>Asset Name</th>
                                 <th>Description</th>
-                                <th>Severity</th>
-                                <th>Status</th>
-                                <th>Created At</th>
+                                <th>
+                                    <a href="#" class="sort-header" data-column="severity">Severity</a>
+                                </th>
+                                <th>
+                                    <a href="#" class="sort-header" data-column="status">Status</a>
+                                </th>
+                                <th>
+                                    <a href="#" class="sort-header" data-column="created_at">Created At</a>
+                                </th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="incidents-tbody">

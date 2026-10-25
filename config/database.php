@@ -18,10 +18,6 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-    // --- Centralized Service & Model Wiring ---
-    $incidentModel = new \PlantOps\Models\Incident($pdo);
-    $incidentService = new \PlantOps\Services\IncidentService($incidentModel);
-
 } catch (PDOException $e) {
     error_log("Database Connection Error: " . $e->getMessage());
     http_response_code(500);

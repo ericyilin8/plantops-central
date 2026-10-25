@@ -18,7 +18,6 @@ $input = json_decode(file_get_contents('php://input'), true);
 try {
     $incidentModel = new \PlantOps\Models\Incident($pdo);
     $incidentService = new \PlantOps\Services\IncidentService($incidentModel);
-    
     $newIncidentId = $incidentService->createIncident($input);
 
     http_response_code(201); // Created
