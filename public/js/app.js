@@ -103,6 +103,8 @@ function loadIncidents(page = 1, sort = 'created_at', direction = 'DESC') {
         error: function(xhr, status, error) {
             $resultBox.removeClass('hidden').addClass('error-box');
             $outputText.addClass('error-text').text('Error fetching data: ' + error);
+            $tbody.html('<tr><td colspan="7" style="text-align:center;">Failed to load incidents.</td></tr>');
+
         },
         complete: function() {
                     
