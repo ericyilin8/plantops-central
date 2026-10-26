@@ -1,3 +1,8 @@
+<?php
+require_once __DIR__ . '/../config/session.php'; 
+
+$isLoggedIn = isset($_SESSION['user_id']);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,15 +13,41 @@
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-    <div id="loading-overlay" class="loading-overlay" style="display: none;">
-        <div class="spinner-container">
-            <div class="spinner"></div>
+    <!-- Login Overlay Modal -->
+    <div id="login-overlay" class="login-overlay" style="display: <?php echo $isLoggedIn ? 'none' : 'flex'; ?>;">
+        <div class="login-modal">
+            <h2>PlantOps Central Login</h2>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="operator_jake" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" value="password123" required>
+                </div>
+                
+                <button type="submit" id="login-btn" class="btn-submit">Sign In</button>
+            </form>
         </div>
+    </div>
+    <!-- Login Overlay Modal -->
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="spinner-container">
+        <div class="spinner"></div>
+    </div>
     </div>
     <div class="container">
         
             <header class="header">
                 <h2>PlantOps Central</h2>
+                <form class="logout-form" action="/api/logout.php" method="POST">
+                <!-- Optional: Add a CSRF token here for extra protection -->
+                    <button type="submit" class="logout-btn">Log Out</button>
+                </form>
             </header>
 
             <main class="card">

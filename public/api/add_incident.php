@@ -3,6 +3,13 @@
 
 header('Content-Type: application/json');
 
+require_once __DIR__ . '/../../config/session.php'; // Ensures session is running and user logged in
+// 1. Strict backend authentication check
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401); // Unauthorized
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
+    exit;
+}
 require_once __DIR__ . '/../../config/database.php';
 
 // Ensure it's a POST request

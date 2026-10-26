@@ -91,10 +91,7 @@ function loadIncidents(page = 1, sort = 'created_at', direction = 'DESC') {
                 const itemsPerPage = 25;
                 const totalPages = Math.ceil(total/ itemsPerPage);
                 renderPagination(totalPages, currentState.page);
-                window.scrollTo({
-                    top: scrollY,
-                    behavior: 'instant'
-                });
+  
             } else {
                 $resultBox.removeClass('hidden').addClass('error-box');
                 $outputText.addClass('error-text').text('Failed to load dashboard data.');
@@ -139,8 +136,8 @@ $(document).on('click', '.page-btn', function(e) {
 $(document).ready(function() {
 
 
-    // 1. Fetch automatically on initial page load
-    loadIncidents(currentState.page, currentState.sort, currentState.direction);
+    // 1. Fetch automatically on initial page load, nvm after login
+    //loadIncidents(currentState.page, currentState.sort, currentState.direction);
 
     // 2. Fetch or refresh when the button is clicked
     $('#load-data-btn').on('click', function() {
@@ -342,3 +339,46 @@ $(document).ready(function() {
 
 });
 //#endregion UPDATE
+
+//#region login
+$('#login-form').on('submit', function(e) {
+    e.preventDefault(); // Stop normal form submit
+    
+    // Grab input values
+    let username = $('#username').val();
+    let password = $('#password').val();
+    
+    // Disable button / show loading state if you want
+    let $btn = $('#login-btn').prop('disabled', true).text('Signing In...');
+
+    // Fire the POST request to your backend
+    $.post('../api/login.php', { 
+        username: username, 
+        password: password 
+    }, function(response) {
+        if (response.success) {
+            // Fade out the overlay to reveal the dashboard beneath!
+            $('#login-overlay').fadeOut(300, function() {
+                // Optional: reload the page so the browser picks up the active PHP session
+                //location.reload();  login loop
+                loadIncidents(currentState.page, currentState.sort, currentState.direction);
+            });
+        } else {
+            // Display the error message returned from PHP
+            alert(response.message);
+            $btn.prop('disabled', false).text('Sign In');
+        }
+    }, 'json').fail(function() {
+        alert('A network or server error occurred.');
+        $btn.prop('disabled', false).text('Sign In');
+    });
+});
+
+$(document).ready(function() {
+    // Check if PHP already bypassed the login modal on page load
+    //since this runs instantly on page load, cant usually bypass ? but i suppose just in case should be ultimately back end secured. 
+    if ($('#login-overlay').css('display') === 'none') {
+        loadIncidents();
+    }
+});
+//#endregion login

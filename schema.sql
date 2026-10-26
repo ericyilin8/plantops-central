@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS incidents (
 
 -- 5. Insert sample seed data to test your UI immediately
 INSERT INTO users (username, password_hash, role) VALUES 
-('operator_john', '$2y$10$abcdefghijklmnopqrstuvwxyz0123456789', 'operator'),
-('tech_sarah', '$2y$10$abcdefghijklmnopqrstuvwxyz0123456789', 'technician');
-
+('operator_jake', '$2y$12$RhpB/usrSqUaODnzmibDkuMUiY4nHyf2NO9hm8iZsR/LsvXF.m/KK', 'operator'),
+('tech_sally', '$2y$12$A6dqdCQ96dx68536jtLrA.4VkJslbBKbbBgoxeHeyxnGbV1aJEGcy', 'technician');
+--password123
 INSERT INTO assets (asset_tag, name, location, status) VALUES 
 ('AST-001', 'CNC Milling Machine #1', 'Building A - Floor 1', 'active'),
 ('AST-002', 'Industrial Conveyor Belt', 'Building B - Packaging', 'maintenance'),
